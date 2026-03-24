@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语音转文字</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        #result {
+            width: 100%;
+            min-height: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #startBtn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        #stopBtn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 语音转文字</h1>
+        <div>
+            <button id="startBtn">开始录音</button>
+            <button id="stopBtn" disabled>停止录音</button>
+        </div>
+        <div class="status" id="status">状态：就绪</div>
+        <textarea id="result" placeholder="语音识别结果将显示在这里..."></textarea>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

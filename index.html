@@ -1,145 +1,149 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>语音转文字工具</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-    body {
-      max-width: 700px;
-      margin: 50px auto;
-      padding: 0 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #333;
-    }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #start { background: #0078d4; color: white; }
-    #stop { background: #d93025; color: white; }
-    #clear { background: #444; color: white; }
-    #copy { background: #107c10; color: white; }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    textarea {
-      width: 100%;
-      height: 220px;
-      padding: 15px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 10px;
-    }
-    #status {
-      text-align: center;
-      font-size: 16px;
-      color: #555;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全平台语音转文字</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #0078d4;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #ccc;
+        }
+
+        #status {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 
 <body>
-  <h1>🎙️ 在线语音转文字</h1>
-  <div class="btn-group">
-    <button id="start">开始录音</button>
-    <button id="stop" disabled>停止录音</button>
-    <button id="clear">清空</button>
-    <button id="copy">复制文本</button>
-  </div>
-  <p id="status">准备就绪</p>
-  <textarea id="result" placeholder="识别结果将显示在这里..."></textarea>
+    <h1>🎙️ 全平台语音转文字</h1>
+    <div class="box">
+        <button id="start">开始录音</button>
+        <button id="stop" disabled>停止</button>
+        <button id="copy">复制</button>
+        <button id="clear">清空</button>
+    </div>
+    <div id="status">准备就绪</div>
+    <textarea id="result" placeholder="识别结果在这里..."></textarea>
 
-  <script>
-    const startBtn = document.getElementById('start');
-    const stopBtn = document.getElementById('stop');
-    const clearBtn = document.getElementById('clear');
-    const copyBtn = document.getElementById('copy');
-    const result = document.getElementById('result');
-    const status = document.getElementById('status');
+    <script>
+        const startBtn = document.getElementById('start');
+        const stopBtn = document.getElementById('stop');
+        const copyBtn = document.getElementById('copy');
+        const clearBtn = document.getElementById('clear');
+        const result = document.getElementById('result');
+        const status = document.getElementById('status');
 
-    let recognition;
-    let isRecording = false;
+        let recognition;
 
-    // 语音识别兼容
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        function initRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                status.textContent = "❌ 你的浏览器不支持语音识别";
+                startBtn.disabled = true;
+                return null;
+            }
 
-    if (!SpeechRecognition) {
-      status.textContent = "❌ 你的浏览器不支持录音";
-      startBtn.disabled = true;
-    } else {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'zh-CN';
-      recognition.continuous = true;
-      recognition.interimResults = true;
+            const rec = new SpeechRecognition();
+            rec.lang = 'zh-CN';
+            rec.continuous = true;
+            rec.interimResults = true;
 
-      recognition.onstart = function () {
-        isRecording = true;
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        status.textContent = "🎤 正在录音...";
-      };
+            rec.onstart = () => {
+                status.textContent = "🎤 正在录音...";
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            };
 
-      recognition.onresult = function (e) {
-        let text = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          text += e.results[i][0].transcript;
+            rec.onresult = (e) => {
+                let text = '';
+                for (let i = e.resultIndex; i < e.results.length; i++) {
+                    text += e.results[i][0].transcript;
+                }
+                result.value = text;
+            };
+
+            rec.onend = () => {
+                if (startBtn.disabled) rec.start();
+            };
+
+            rec.onerror = (e) => {
+                status.textContent = "⚠️ 出错：" + e.error;
+            };
+
+            return rec;
         }
-        result.value = text;
-      };
 
-      recognition.onend = function () {
-        if (isRecording) recognition.start();
-      };
+        startBtn.onclick = () => {
+            if (!recognition) recognition = initRecognition();
+            if (recognition) recognition.start();
+        };
 
-      recognition.onerror = function (e) {
-        status.textContent = "⚠️ 出错：" + e.error;
-      };
-    }
+        stopBtn.onclick = () => {
+            if (recognition) recognition.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            status.textContent = "✅ 已停止";
+        };
 
-    startBtn.onclick = function () {
-      recognition.start();
-    };
+        copyBtn.onclick = () => {
+            result.select();
+            document.execCommand('copy');
+            status.textContent = "✅ 已复制";
+        };
 
-    stopBtn.onclick = function () {
-      isRecording = false;
-      recognition.stop();
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      status.textContent = "✅ 已停止";
-    };
-
-    clearBtn.onclick = function () {
-      result.value = '';
-      status.textContent = "🗑️ 已清空";
-    };
-
-    copyBtn.onclick = function () {
-      result.select();
-      document.execCommand('copy');
-      status.textContent = "✅ 已复制到剪贴板";
-    };
-  </script>
+        clearBtn.onclick = () => {
+            result.value = '';
+            status.textContent = "🗑️ 已清空";
+        };
+    </script>
 </body>
 </html>
